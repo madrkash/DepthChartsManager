@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Repositories\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Repositories\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DepthChartsManager.Core\DepthChartsManager.Core.csproj" />
+    <ProjectReference Include="..\DepthChartsManager.Common\DepthChartsManager.Common.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Repositories\LeagueRepository.cs" />
+    <Compile Remove="Repositories\TeamRepository.cs" />
+    <Compile Remove="Repositories\PlayerRepository.cs" />
+  </ItemGroup>
+</Project>
