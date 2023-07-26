@@ -2,6 +2,8 @@
 using AutoMapper;
 using DepthChartsManager.Common.Request;
 using DepthChartsManager.Core.Contracts;
+using DepthChartsManager.Core.Exceptions;
+using DepthChartsManager.Core.UseCases.League;
 using MediatR;
 
 namespace DepthChartsManager.Core.UseCases.Team
@@ -18,25 +20,37 @@ namespace DepthChartsManager.Core.UseCases.Team
 
     public class AddTeamCommandHandler : IRequestHandler<AddTeamCommand, Models.Team>
     {
-        private readonly ISportRepository _sportRepository;
+        private readonly ITeamRepository _teamRepository;
+        private readonly ILeagueRepository _leagueRepository;
 
-        public AddTeamCommandHandler(ISportRepository sportRepository)
+        public AddTeamCommandHandler(ILeagueRepository leagueRepository, ITeamRepository teamRepository)
         {  
-            _sportRepository = sportRepository;
+            _teamRepository = teamRepository;
+            _leagueRepository = leagueRepository;
         }
 
         public Task<Models.Team> Handle(AddTeamCommand request, CancellationToken cancellationToken)
         {
-            try
+
+            _ = _leagueRepository.GetLeague(request.CreateTeamRequest.LeagueId) ??
+                throw new LeagueNotFoundException(request.CreateTeamRequest.LeagueId);
+
+            var teams = _teamRepository.GetTeams(request.CreateTeamRequest.LeagueId).ToList();
+
+            if(DoesTeamExist(request, teams))
             {
-                return Task.FromResult(_sportRepository.AddTeam(request.CreateTeamRequest));
+                throw new TeamAlreadyExistsException(request.CreateTeamRequest.TeamName);
             }
-            catch (Exception ex)
+
+            return Task.FromResult(_teamRepository.AddTeam(new Models.Team
             {
-                //TODO: Create custom / common exception
-                throw new Exception(ex.Message);
-            }
+                Id = request.CreateTeamRequest.Id,
+                LeagueId = request.CreateTeamRequest.LeagueId,
+                Name = request.CreateTeamRequest.TeamName
+            }));
         }
+
+        private static bool DoesTeamExist(AddTeamCommand request, List<Models.Team> teams) => teams.Any() && teams.Any(team => team.Name == request.CreateTeamRequest.TeamName);
     }
 }
 

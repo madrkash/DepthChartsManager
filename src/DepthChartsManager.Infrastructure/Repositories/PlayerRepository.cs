@@ -7,31 +7,43 @@ namespace DepthChartsManager.Infrastructure.Repositories
 {
 	public class PlayerRepository : IPlayerRepository
 	{
-        private readonly List<Player> _players;
+        private List<Player> _players;
 
 		public PlayerRepository()
 		{
             _players = new List<Player>();
         }
-
+         
         public Player AddPlayerToDepthChart(Player player)
         {
+            _players.Add(player);
             return player;
         }
 
-        public IEnumerable<Player> GetBackups(GetPlayerBackupsRequest getPlayerBackupsRequest)
+        /// <summary>
+        /// Update selected player positions by joining with the original collection
+        /// </summary>
+        /// <param name="playersToBeUpdated"></param>
+        public void UpdatePlayerPositions(IEnumerable<Player> playersToBeUpdated)
         {
-            throw new NotImplementedException();
+            var teamPlayers = _players.Where(player => player.LeagueId == playersToBeUpdated.First().LeagueId && player.TeamId == playersToBeUpdated.First().TeamId).ToList();
+
+            _ = teamPlayers.Join(playersToBeUpdated, teamPlayer => teamPlayer.Id, updatedPlayer => updatedPlayer.Id, (teamPlayer, updatedPlayer) =>
+            {
+                teamPlayer.PositionDepth = updatedPlayer.PositionDepth;
+                return teamPlayer;
+            });
+        }
+        
+        public IEnumerable<Player> GetAllPlayers(GetAllPlayersRequest getAllPlayersRequest)
+        {
+            return _players.Where(player => player.LeagueId == getAllPlayersRequest.LeagueId && player.TeamId == getAllPlayersRequest.TeamId);
         }
 
-        public IEnumerable<Player> GetFullDepthChart(GetFullDepthChartRequest getFullDepthChartRequest)
+        public Player RemovePlayerFromDepthChart(Player player)
         {
-            throw new NotImplementedException();
-        }
-
-        public Player RemovePlayerFromDepthChart(RemovePlayerRequest removePlayerFromDepthChartRequest)
-        {
-            throw new NotImplementedException();
+            _players.Remove(player);
+            return player;
         }
     }
 }

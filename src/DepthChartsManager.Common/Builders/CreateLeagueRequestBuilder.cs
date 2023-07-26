@@ -1,6 +1,6 @@
 ﻿using DepthChartsManager.Common.Request;
 
-namespace DepthChartsManager.ConsoleApp.Builders
+namespace DepthChartsManager.Common.Builders
 {
 	public class CreateLeagueRequestBuilder
 	{

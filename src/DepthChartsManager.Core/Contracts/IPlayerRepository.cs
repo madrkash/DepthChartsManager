@@ -8,8 +8,8 @@ namespace DepthChartsManager.Core.Contracts
 	{
         Player AddPlayerToDepthChart(Player player);
         Player RemovePlayerFromDepthChart(Player player);
-        IEnumerable<Player> GetBackups(GetPlayerBackupsRequest getPlayerBackupsDto);
-        IEnumerable<Player> GetFullDepthChart(GetFullDepthChartRequest getFullDepthChartDto);
+        IEnumerable<Player> GetAllPlayers(GetAllPlayersRequest getFullDepthChartRequest);
+        void UpdatePlayerPositions(IEnumerable<Player> players);
     }
 }
 

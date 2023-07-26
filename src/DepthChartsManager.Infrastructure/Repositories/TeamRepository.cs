@@ -7,20 +7,26 @@ namespace DepthChartsManager.Infrastructure.Repositories
 {
 	public class TeamRepository : ITeamRepository
 	{
+        private List<Team> _teams;
 		public TeamRepository()
 		{
-
-		}
+            _teams = new List<Team>();
+        }
 
         public Team AddTeam(Team team)
         {
-            //Persist this wherever required
+            _teams.Add(team);
             return team;
         }
 
         public IEnumerable<Team> GetTeams(int leagueId)
         {
-            throw new NotImplementedException();
+            return _teams;
+        }
+
+        public Team GetTeam(int id)
+        {
+            return _teams.Find(t => t.Id == id);
         }
     }
 }

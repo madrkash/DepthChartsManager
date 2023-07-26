@@ -4,9 +4,9 @@ using FluentValidation;
 
 namespace DepthChartsManager.ConsoleApp.Validators
 {
-	public class GetFullDepthChartRequestValidator: AbstractValidator<GetFullDepthChartRequest>
+	public class GetAllPlayersRequestValidator: AbstractValidator<GetAllPlayersRequest>
 	{
-		public GetFullDepthChartRequestValidator()
+		public GetAllPlayersRequestValidator()
 		{
 			RuleFor(x => x.LeagueId).NotEmpty();
             RuleFor(x => x.TeamId).NotEmpty();

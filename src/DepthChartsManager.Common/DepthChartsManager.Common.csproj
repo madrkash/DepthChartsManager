@@ -10,10 +10,12 @@
     <None Remove="Request\" />
     <None Remove="Response\" />
     <None Remove="Constants\" />
+    <None Remove="Builders\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Request\" />
     <Folder Include="Response\" />
     <Folder Include="Constants\" />
+    <Folder Include="Builders\" />
   </ItemGroup>
 </Project>

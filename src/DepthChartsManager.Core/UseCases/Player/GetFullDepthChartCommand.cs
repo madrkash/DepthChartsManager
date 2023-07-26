@@ -9,34 +9,26 @@ namespace DepthChartsManager.Core.UseCases.Player
 {
     public class GetFullDepthChartCommand : IRequest<IEnumerable<Models.Player>>
     {
-        public GetFullDepthChartCommand(GetFullDepthChartRequest getFullDepthChartRequest)
+        public GetFullDepthChartCommand(GetAllPlayersRequest getFullDepthChartRequest)
         {
             GetFullDepthChartRequest = getFullDepthChartRequest;
         }
 
-        public GetFullDepthChartRequest GetFullDepthChartRequest { get; }
+        public GetAllPlayersRequest GetFullDepthChartRequest { get; }
     }
 
     public class GetFullDepthChartCommandHandler : IRequestHandler<GetFullDepthChartCommand, IEnumerable<Models.Player>>
     {
-        private readonly ISportRepository _sportRepository;
+        private readonly IPlayerRepository _playerRepository;
 
-        public GetFullDepthChartCommandHandler(ISportRepository sportRepository)
+        public GetFullDepthChartCommandHandler(IPlayerRepository playerRepository)
         {
-            _sportRepository = sportRepository;
+            _playerRepository = playerRepository;
         }
 
         public Task<IEnumerable<Models.Player>> Handle(GetFullDepthChartCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
-                return Task.FromResult(_sportRepository.GetFullDepthChart(request.GetFullDepthChartRequest));
-            }
-            catch (Exception ex)
-            {
-                //TODO: Custom exception
-                throw new Exception(ex.Message);
-            }
+             return Task.FromResult(_playerRepository.GetAllPlayers(request.GetFullDepthChartRequest));
         }
     }
 }

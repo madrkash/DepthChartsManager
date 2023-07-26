@@ -1,11 +1,11 @@
 ﻿using System;
 using DepthChartsManager.Common.Request;
 
-namespace DepthChartsManager.ConsoleApp.Builders
+namespace DepthChartsManager.Common.Builders
 {
 	public class GetFullDepthChartRequestBuilder
 	{
-        private GetFullDepthChartRequest _getFullDepthChartRequest = new GetFullDepthChartRequest();
+        private GetAllPlayersRequest _getFullDepthChartRequest = new GetAllPlayersRequest();
 
         public GetFullDepthChartRequestBuilder WithLeagueId(int leagueId)
         {
@@ -19,7 +19,7 @@ namespace DepthChartsManager.ConsoleApp.Builders
             return this;
         }
 
-        public GetFullDepthChartRequest Build() => _getFullDepthChartRequest;
+        public GetAllPlayersRequest Build() => _getFullDepthChartRequest;
     }
 }
 

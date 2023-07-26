@@ -1,5 +1,5 @@
 ﻿using System;
-namespace DepthChartsManager.ConsoleApp.Builders
+namespace DepthChartsManager.Common.Builders
 {
 	public static class EntityCounter
 	{

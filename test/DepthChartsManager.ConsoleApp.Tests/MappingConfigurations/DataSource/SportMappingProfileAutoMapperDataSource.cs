@@ -9,10 +9,11 @@ namespace DepthChartsManager.Console.Tests.MappingConfigurations.DataSource
         {
             yield return new object[]
             {
-                new Core.Models.League(new Common.Request.CreateLeagueRequest
+                new Core.Models.League
                 {
-                    Id = 1, Name = "NFL"
-                })
+                    Id = 1,
+                    Name = "NFL"
+                }
             };
           
         }
@@ -26,7 +27,7 @@ namespace DepthChartsManager.Console.Tests.MappingConfigurations.DataSource
         { 
             yield return new object[]
             {
-                new Core.Models.Team(1, 1, "NFL")
+                new Core.Models.Team{Id = 1, LeagueId = 1, Name = "NFL" }
             };
         }
 
@@ -40,7 +41,7 @@ namespace DepthChartsManager.Console.Tests.MappingConfigurations.DataSource
             
             yield return new object[]
             {
-                new Core.Models.Player(1, 1, 1, "John Doe", NFLPositions.QB, null)
+                new Core.Models.Player{ Id = 1, LeagueId = 1, TeamId = 1, Name = "John Doe", Position = NFLPositions.QB, PositionDepth = null }
             };
         }
 

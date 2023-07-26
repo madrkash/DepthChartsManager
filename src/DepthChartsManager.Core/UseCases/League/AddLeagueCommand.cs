@@ -2,6 +2,7 @@
 using AutoMapper;
 using DepthChartsManager.Common.Request;
 using DepthChartsManager.Core.Contracts;
+using DepthChartsManager.Core.Exceptions;
 using MediatR;
 
 namespace DepthChartsManager.Core.UseCases.League
@@ -19,18 +20,27 @@ namespace DepthChartsManager.Core.UseCases.League
     public class AddLeagueCommandHandler : IRequestHandler<AddLeagueCommand, Models.League>
     {
         private readonly IMapper _mapper;
-        private readonly ISportRepository _sportRepository;
+        private readonly ILeagueRepository _leagueRepository;
 
-        public AddLeagueCommandHandler(IMapper mapper, ISportRepository sportRepository)
+        public AddLeagueCommandHandler(IMapper mapper, ILeagueRepository leagueRepository)
         {
             _mapper = mapper;
-            _sportRepository = sportRepository;
+            _leagueRepository = leagueRepository;
         }
 
         public Task<Models.League> Handle(AddLeagueCommand request, CancellationToken cancellationToken)
         {
-            return Task.FromResult(_sportRepository.AddLeague(request.CreateLeagueRequest));
+            var leagues = _leagueRepository.GetLeagues().ToList();
+
+            if(DoesLeagueExist(request, leagues))
+            {
+                throw new LeagueAlreadyExistsException(request.CreateLeagueRequest.Name);
+            }
+
+            return Task.FromResult(_leagueRepository.AddLeague(new Models.League { Id = request.CreateLeagueRequest.Id, Name = request.CreateLeagueRequest.Name }));
         }
+
+        private static bool DoesLeagueExist(AddLeagueCommand request, List<Models.League> leagues) => leagues.Any() && leagues.Any(league => league.Name == request.CreateLeagueRequest.Name);
     }
 }
 

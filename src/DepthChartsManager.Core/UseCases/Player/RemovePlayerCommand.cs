@@ -2,6 +2,8 @@
 using AutoMapper;
 using DepthChartsManager.Common.Request;
 using DepthChartsManager.Core.Contracts;
+using DepthChartsManager.Core.Exceptions;
+using DepthChartsManager.Core.Models;
 using MediatR;
 
 namespace DepthChartsManager.Core.UseCases.Player
@@ -19,25 +21,41 @@ namespace DepthChartsManager.Core.UseCases.Player
     public class RemovePlayerCommandHandler : IRequestHandler<RemovePlayerCommand, Models.Player>
     {
         private readonly IMapper _mapper;
-        public readonly ISportRepository _sportRepository;
+        public readonly IPlayerRepository _playerRepository;
 
-        public RemovePlayerCommandHandler(IMapper mapper, ISportRepository sportRepository)
+        public RemovePlayerCommandHandler(IMapper mapper, IPlayerRepository playerRepository)
         {
             _mapper = mapper;
-            _sportRepository = sportRepository;
+            _playerRepository = playerRepository;
         }
 
         public Task<Models.Player> Handle(RemovePlayerCommand request, CancellationToken cancellationToken)
         {
-            try
+             
+            //Get list of players from repository
+            var players = _playerRepository.GetAllPlayers(new GetAllPlayersRequest { TeamId = request.RemovePlayerRequest.TeamId, LeagueId = request.RemovePlayerRequest.LeagueId }).ToList();
+            if (!players.Any())
             {
-                return Task.FromResult(_sportRepository.RemovePlayerFromDepthChart(request.RemovePlayerRequest));
+                throw new PlayersNotFoundException(request.RemovePlayerRequest.LeagueId, request.RemovePlayerRequest.TeamId);
             }
-            catch (Exception ex)
-            {
-                //TODO: Custom exception
-                throw new Exception(ex.Message);
-            }
+
+            //find the player to be removed
+            var player = players.Find(player => player.Id == request.RemovePlayerRequest.Id
+                                                && string.Equals(request.RemovePlayerRequest.Name, player.Name, StringComparison.OrdinalIgnoreCase)
+                                                && string.Equals(request.RemovePlayerRequest.Position, player.Position, StringComparison.OrdinalIgnoreCase))
+                ?? throw new PlayerNotFoundException(request.RemovePlayerRequest.TeamId, request.RemovePlayerRequest.Position);
+
+            //filter out the players to be updated
+            var backupPlayers = players.Where(nextPlayer => nextPlayer.Position == player.Position && nextPlayer.PositionDepth > player.PositionDepth).ToList();
+
+            //remove the player from players to repository
+            _playerRepository.RemovePlayerFromDepthChart(player);
+
+            //update the player positions to repository
+            backupPlayers.ForEach(player => player.PositionDepth = player.PositionDepth - 1);
+            _playerRepository.UpdatePlayerPositions(backupPlayers);
+
+            return Task.FromResult(player);
         }
     }
 }

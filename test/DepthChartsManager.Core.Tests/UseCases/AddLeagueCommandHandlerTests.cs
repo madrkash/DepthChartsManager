@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
 using DepthChartsManager.Common.Request;
 using DepthChartsManager.Core.Contracts;
-using DepthChartsManager.Core.Models;
 using DepthChartsManager.Core.UseCases.League;
 using Moq;
+using DepthChartsManager.Core.Exceptions;
+using DepthChartsManager.Core.Models;
+
 namespace DepthChartsManager.Core.Tests.UseCases
 {
+
 
     public class AddLeagueCommandHandlerTests
     {
@@ -19,31 +22,36 @@ namespace DepthChartsManager.Core.Tests.UseCases
                 Name = "Test League"
             };
 
-            var leagueToAdd = new League(createLeagueRequest.Id, createLeagueRequest.Name);
+            var leagues = new List<League>
+                {
+                    new League { Id = 2, Name = "Other League" }
+                };
 
-            var mockMapper = new Mock<IMapper>();
-            mockMapper.Setup(m => m.Map<League>(createLeagueRequest)).Returns(leagueToAdd);
+            var leagueRepositoryMock = new Mock<ILeagueRepository>();
+            leagueRepositoryMock.Setup(r => r.GetLeagues())
+                .Returns(leagues);
+            leagueRepositoryMock.Setup(r => r.AddLeague(It.IsAny<League>()))
+                .Returns<League>(league => league); // Return the league as it is for verification purposes
 
-            var mockLeagueRepository = new Mock<ISportRepository>();
-            mockLeagueRepository.Setup(r => r.AddLeague(createLeagueRequest)).Returns(leagueToAdd);
+            var mapperMock = new Mock<IMapper>();
 
-            var commandHandler = new AddLeagueCommandHandler(mockMapper.Object, mockLeagueRepository.Object);
-            var command = new AddLeagueCommand(createLeagueRequest);
+            var commandHandler = new AddLeagueCommandHandler(mapperMock.Object, leagueRepositoryMock.Object);
 
             // Act
-            var result = await commandHandler.Handle(command, CancellationToken.None);
+            var result = await commandHandler.Handle(new AddLeagueCommand(createLeagueRequest), CancellationToken.None);
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(leagueToAdd.Id, result.Id);
-            Assert.Equal(leagueToAdd.Name, result.Name);
+            Assert.Equal(createLeagueRequest.Id, result.Id);
+            Assert.Equal(createLeagueRequest.Name, result.Name);
 
-            // Verify that the repository method was called with the correct parameter
-            mockLeagueRepository.Verify(r => r.AddLeague(createLeagueRequest), Times.Once);
+            // Verify that the repository methods were called with the correct parameters
+            leagueRepositoryMock.Verify(r => r.GetLeagues(), Times.Once);
+            leagueRepositoryMock.Verify(r => r.AddLeague(It.IsAny<League>()), Times.Once);
         }
 
         [Fact]
-        public async Task Handle_RepositoryThrowsException_ShouldThrowException()
+        public async Task Handle_LeagueAlreadyExists_ShouldThrowLeagueAlreadyExistsException()
         {
             // Arrange
             var createLeagueRequest = new CreateLeagueRequest
@@ -52,16 +60,24 @@ namespace DepthChartsManager.Core.Tests.UseCases
                 Name = "Test League"
             };
 
-            var mockMapper = new Mock<IMapper>();
-            var mockLeagueRepository = new Mock<ISportRepository>();
-            mockLeagueRepository.Setup(r => r.AddLeague(createLeagueRequest)).Throws(new Exception("Repository error"));
+            var leagues = new List<League>
+        {
+            new League { Id = 1, Name = "Test League" },
+            new League { Id = 2, Name = "Other League" }
+        };
 
-            var commandHandler = new AddLeagueCommandHandler(mockMapper.Object, mockLeagueRepository.Object);
-            var command = new AddLeagueCommand(createLeagueRequest);
+            var leagueRepositoryMock = new Mock<ILeagueRepository>();
+            leagueRepositoryMock.Setup(r => r.GetLeagues())
+                .Returns(leagues);
+
+            var mapperMock = new Mock<IMapper>();
+
+            var commandHandler = new AddLeagueCommandHandler(mapperMock.Object, leagueRepositoryMock.Object);
 
             // Act & Assert
-            await Assert.ThrowsAsync<Exception>(() => commandHandler.Handle(command, CancellationToken.None));
+            await Assert.ThrowsAsync<LeagueAlreadyExistsException>(() => commandHandler.Handle(new AddLeagueCommand(createLeagueRequest), CancellationToken.None));
         }
     }
+
 }
 

@@ -13,7 +13,7 @@ namespace DepthChartsManager.Core.Contracts
         Task<Player> AddPlayerToDepthChart(CreatePlayerRequest createPlayerRequest);
         Task<Player> RemovePlayerFromDepthChart(RemovePlayerRequest removePlayerFromDepthChartRequest);
         Task<IEnumerable<Player>> GetPlayerBackups(GetPlayerBackupsRequest getPlayerBackupsRequest);
-        Task<IEnumerable<Player>> GetFullDepthChart(GetFullDepthChartRequest getFullDepthChartRequest);
+        Task<IEnumerable<Player>> GetFullDepthChart(GetAllPlayersRequest getFullDepthChartRequest);
     }
 }
 

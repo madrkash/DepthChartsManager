@@ -2,7 +2,7 @@
 using System.Reflection;
 using AutoMapper;
 using DepthChartsManager.Common.Constants;
-using DepthChartsManager.ConsoleApp.Builders;
+using DepthChartsManager.Common.Builders;
 using DepthChartsManager.Core.Contracts;
 using DepthChartsManager.Core.Services;
 using DepthChartsManager.Infrastructure.Repositories;
@@ -19,7 +19,9 @@ namespace DepthChartsManager.ConsoleApp.Tests.Component
             var services = new ServiceCollection();
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ILeagueRepository).Assembly));
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
-            services.AddSingleton<ISportRepository, SportRepository>();
+            services.AddSingleton<ILeagueRepository, LeagueRepository>();
+            services.AddSingleton<ITeamRepository, TeamRepository>();
+            services.AddSingleton<IPlayerRepository, PlayerRepository>();
             services.AddSingleton<IDepthChartService, DepthChartService>();
             _serviceProvider = services.BuildServiceProvider();
         }

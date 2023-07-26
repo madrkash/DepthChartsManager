@@ -1,7 +1,8 @@
-﻿using AutoMapper;
-using DepthChartsManager.Common.Request;
+﻿using DepthChartsManager.Common.Request;
 using DepthChartsManager.Core.Contracts;
+using DepthChartsManager.Core.Exceptions;
 using DepthChartsManager.Core.Models;
+using DepthChartsManager.Core.UseCases.League;
 using DepthChartsManager.Core.UseCases.Player;
 using Moq;
 
@@ -15,68 +16,98 @@ namespace DepthChartsManager.Core.Tests.UseCases
             // Arrange
             var getPlayerBackupsRequest = new GetPlayerBackupsRequest
             {
-                PlayerId = 1,
-                Position = "Forward",
                 LeagueId = 1,
-                Name = "Jane Smith",
-                TeamId = 1
+                TeamId = 1,
+                PlayerId = 2,
+                Position = "QB"
             };
 
-        var backupPlayers = new List<Player>
+            var players = new List<Player>
         {
-            new Player(1, 1, 1, "Jane Smith", "Forward",0),
-            new Player(2, 1, 1, "Michael Johnson", "Forward",1)
+            new Player { Id = 1, LeagueId = 1, TeamId = 1, Position = "QB", PositionDepth = 0},
+            new Player { Id = 2, LeagueId = 1, TeamId = 1, Position = "QB", PositionDepth = 1 },
+            new Player { Id = 3, LeagueId = 1, TeamId = 1, Position = "QB", PositionDepth = 2 },
         };
 
-            var mockMapper = new Mock<IMapper>();
-            var mockSportRepository = new Mock<ISportRepository>();
-            mockSportRepository.Setup(r => r.GetBackups(getPlayerBackupsRequest)).Returns(backupPlayers);
+            var playerRepositoryMock = new Mock<IPlayerRepository>();
+            playerRepositoryMock.Setup(r => r.GetAllPlayers(It.IsAny<GetAllPlayersRequest>()))
+                .Returns<GetAllPlayersRequest>(request => players.Where(p => p.LeagueId == request.LeagueId && p.TeamId == request.TeamId).ToList());
 
-            var commandHandler = new GetPlayerBackupsCommandHandler(mockSportRepository.Object);
-            var command = new GetPlayerBackupsCommand(getPlayerBackupsRequest);
+            var commandHandler = new GetPlayerBackupsCommandHandler(playerRepositoryMock.Object);
 
             // Act
-            var result = await commandHandler.Handle(command, CancellationToken.None);
+            var result = await commandHandler.Handle(new GetPlayerBackupsCommand(getPlayerBackupsRequest), CancellationToken.None);
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(2, result.Count());
+            Assert.Single(result);
+            Assert.Equal(3, result.First().Id);
+            Assert.Equal(2, result.First().PositionDepth);
 
-            var resultPlayer1 = result.ElementAt(0);
-            Assert.Equal(backupPlayers[0].Id, resultPlayer1.Id);
-            Assert.Equal(backupPlayers[0].Name, resultPlayer1.Name);
-            Assert.Equal(backupPlayers[0].Position, resultPlayer1.Position);
-
-            var resultPlayer2 = result.ElementAt(1);
-            Assert.Equal(backupPlayers[1].Id, resultPlayer2.Id);
-            Assert.Equal(backupPlayers[1].Name, resultPlayer2.Name);
-            Assert.Equal(backupPlayers[1].Position, resultPlayer2.Position);
-
-            // Verify that the repository method was called with the correct parameter
-            mockSportRepository.Verify(r => r.GetBackups(getPlayerBackupsRequest), Times.Once);
+            // Verify that the repository method was called with the correct parameters
+            playerRepositoryMock.Verify(r => r.GetAllPlayers(It.IsAny<GetAllPlayersRequest>()), Times.Once);
         }
 
         [Fact]
-        public async Task Handle_RepositoryThrowsException_ShouldThrowException()
+        public async Task Handle_NoBackupPlayers_ShouldReturnEmptyList()
         {
             // Arrange
             var getPlayerBackupsRequest = new GetPlayerBackupsRequest
             {
+                LeagueId = 1,
+                TeamId = 1,
                 PlayerId = 1,
-                Position = "Forward"
+                Position = "QB"
             };
 
-            var mockMapper = new Mock<IMapper>();
-            var mockSportRepository = new Mock<ISportRepository>();
-            mockSportRepository.Setup(r => r.GetBackups(getPlayerBackupsRequest)).Throws(new Exception("Repository error"));
+            var players = new List<Player>
+        {
+            new Player { Id = 1, LeagueId = 1, TeamId = 1, Position = "QB", PositionDepth = 1 },
+            new Player { Id = 3, LeagueId = 1, TeamId = 1, Position = "RB", PositionDepth = 1 },
+        };
 
-            var commandHandler = new GetPlayerBackupsCommandHandler(mockSportRepository.Object);
-            var command = new GetPlayerBackupsCommand(getPlayerBackupsRequest);
+            var playerRepositoryMock = new Mock<IPlayerRepository>();
+            playerRepositoryMock.Setup(r => r.GetAllPlayers(It.IsAny<GetAllPlayersRequest>()))
+                .Returns<GetAllPlayersRequest>(request => players.Where(p => p.LeagueId == request.LeagueId && p.TeamId == request.TeamId).ToList());
+
+            var commandHandler = new GetPlayerBackupsCommandHandler(playerRepositoryMock.Object);
+
+            // Act
+            var result = await commandHandler.Handle(new GetPlayerBackupsCommand(getPlayerBackupsRequest), CancellationToken.None);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Empty(result);
+
+            // Verify that the repository method was called with the correct parameters
+            playerRepositoryMock.Verify(r => r.GetAllPlayers(It.IsAny<GetAllPlayersRequest>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task Handle_NoPlayersAvailable_ShouldThrowPlayersNotFoundException()
+        {
+            // Arrange
+            var getPlayerBackupsRequest = new GetPlayerBackupsRequest
+            {
+                LeagueId = 1,
+                TeamId = 1,
+                PlayerId = 1,
+                Position = "QB"
+            };
+
+            var players = new List<Player> { };
+
+            var playerRepositoryMock = new Mock<IPlayerRepository>();
+            playerRepositoryMock.Setup(r => r.GetAllPlayers(It.IsAny<GetAllPlayersRequest>()))
+                .Returns(players);
+
+            var commandHandler = new GetPlayerBackupsCommandHandler(playerRepositoryMock.Object);
 
             // Act & Assert
-            await Assert.ThrowsAsync<Exception>(() => commandHandler.Handle(command, CancellationToken.None));
+            await Assert.ThrowsAsync<PlayersNotFoundException>(() => commandHandler.Handle(new GetPlayerBackupsCommand(getPlayerBackupsRequest), CancellationToken.None));
         }
     }
+
 
 }
 

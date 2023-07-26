@@ -1,89 +1,78 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using AutoMapper;
-using DepthChartsManager.Common.Request;
+﻿using DepthChartsManager.Common.Request;
 using DepthChartsManager.Core.Contracts;
 using DepthChartsManager.Core.Models;
 using DepthChartsManager.Core.UseCases.Player;
 using Moq;
-using Xunit;
+
 
 namespace DepthChartsManager.Core.Tests.UseCases
 {
+
     public class GetFullDepthChartCommandHandlerTests
     {
         [Fact]
         public async Task Handle_ValidRequest_ShouldReturnFullDepthChart()
         {
             // Arrange
-            var getFullDepthChartRequest = new GetFullDepthChartRequest
+            var getFullDepthChartRequest = new GetAllPlayersRequest
             {
                 LeagueId = 1,
                 TeamId = 1
             };
 
-            var fullDepthChart = new List<Player>
-            {
-                new Player(1, 1, 1, "John Doe", "Forward",0),
-                new Player(2, 1, 1, "Jane Smith", "Forward",0),
-                new Player(3, 1, 1, "Michael Johnson", "Midfielder",0),
-            };
+            var players = new List<Player>
+        {
+            new Player { Id = 1, LeagueId = 1, TeamId = 1, Name = "Player 1", Position = "QB", PositionDepth = 1 },
+            new Player { Id = 2, LeagueId = 1, TeamId = 1, Name = "Player 2", Position = "QB", PositionDepth = 2 },
+            new Player { Id = 3, LeagueId = 1, TeamId = 1, Name = "Player 3", Position = "RB", PositionDepth = 1 },
+        };
 
-            var mockSportRepository = new Mock<ISportRepository>();
-            mockSportRepository.Setup(r => r.GetFullDepthChart(getFullDepthChartRequest)).Returns(fullDepthChart);
+            var playerRepositoryMock = new Mock<IPlayerRepository>();
+            playerRepositoryMock.Setup(r => r.GetAllPlayers(getFullDepthChartRequest))
+                .Returns(players);
 
-            var commandHandler = new GetFullDepthChartCommandHandler(mockSportRepository.Object);
-            var command = new GetFullDepthChartCommand(getFullDepthChartRequest);
+            var commandHandler = new GetFullDepthChartCommandHandler(playerRepositoryMock.Object);
 
             // Act
-            var result = await commandHandler.Handle(command, CancellationToken.None);
+            var result = await commandHandler.Handle(new GetFullDepthChartCommand(getFullDepthChartRequest), CancellationToken.None);
 
             // Assert
             Assert.NotNull(result);
             Assert.Equal(3, result.Count());
 
-            var resultPlayer1 = result.ElementAt(0);
-            Assert.Equal(fullDepthChart[0].Id, resultPlayer1.Id);
-            Assert.Equal(fullDepthChart[0].Name, resultPlayer1.Name);
-            Assert.Equal(fullDepthChart[0].Position, resultPlayer1.Position);
-
-            var resultPlayer2 = result.ElementAt(1);
-            Assert.Equal(fullDepthChart[1].Id, resultPlayer2.Id);
-            Assert.Equal(fullDepthChart[1].Name, resultPlayer2.Name);
-            Assert.Equal(fullDepthChart[1].Position, resultPlayer2.Position);
-
-            var resultPlayer3 = result.ElementAt(2);
-            Assert.Equal(fullDepthChart[2].Id, resultPlayer3.Id);
-            Assert.Equal(fullDepthChart[2].Name, resultPlayer3.Name);
-            Assert.Equal(fullDepthChart[2].Position, resultPlayer3.Position);
-
-            // Verify that the repository method was called with the correct parameter
-            mockSportRepository.Verify(r => r.GetFullDepthChart(getFullDepthChartRequest), Times.Once);
+            // Verify that the repository method was called with the correct parameters
+            playerRepositoryMock.Verify(r => r.GetAllPlayers(getFullDepthChartRequest), Times.Once);
         }
 
         [Fact]
-        public async Task Handle_RepositoryThrowsException_ShouldThrowException()
+        public async Task Handle_EmptyDepthChart_ShouldReturnEmptyList()
         {
             // Arrange
-            var getFullDepthChartRequest = new GetFullDepthChartRequest
+            var getFullDepthChartRequest = new GetAllPlayersRequest
             {
-                LeagueId = 1,
-                TeamId = 1
+                LeagueId = 2,
+                TeamId = 2
             };
 
-            var mockMapper = new Mock<IMapper>();
-            var mockSportRepository = new Mock<ISportRepository>();
-            mockSportRepository.Setup(r => r.GetFullDepthChart(getFullDepthChartRequest)).Throws(new Exception("Repository error"));
+            var playerRepositoryMock = new Mock<IPlayerRepository>();
+            playerRepositoryMock.Setup(r => r.GetAllPlayers(getFullDepthChartRequest))
+                .Returns(new List<Player>());
 
-            var commandHandler = new GetFullDepthChartCommandHandler(mockSportRepository.Object);
-            var command = new GetFullDepthChartCommand(getFullDepthChartRequest);
+            var commandHandler = new GetFullDepthChartCommandHandler(playerRepositoryMock.Object);
 
-            // Act & Assert
-            await Assert.ThrowsAsync<Exception>(() => commandHandler.Handle(command, CancellationToken.None));
+            // Act
+            var result = await commandHandler.Handle(new GetFullDepthChartCommand(getFullDepthChartRequest), CancellationToken.None);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Empty(result);
+
+            // Verify that the repository method was called with the correct parameters
+            playerRepositoryMock.Verify(r => r.GetAllPlayers(getFullDepthChartRequest), Times.Once);
         }
+
     }
+
 
 }
 

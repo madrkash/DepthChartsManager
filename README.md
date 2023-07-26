@@ -8,23 +8,18 @@ Coming soon...
 
 * Component testing
 * Verify every use case mentioned in the coding challenge is covered
-* Validation to be placed within the service layer
 
 
 # Implementation Details
 * Clean Architecture
 * Input validation using fluent validation
-* Mediator pattern to handle the complexity of object communication
-* Unit tests for every class
+* Mediator pattern to handle the complexity of multiple object communication
+* Healthy Unit tests coverage
 * Builder pattern for cleaner object construction
-
-
+* Custom exceptions
 
 # Few Constraints
-
 * No persistence layer implemented.
-* Single repository to cater to the hierarchical nature of data without a persistence layer.
-* Rich models versus POCO models
 
 # If I had more time, I would have implemented the below.
 

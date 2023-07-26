@@ -17,8 +17,6 @@
     <ProjectReference Include="..\DepthChartsManager.Common\DepthChartsManager.Common.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Remove="Repositories\LeagueRepository.cs" />
-    <Compile Remove="Repositories\TeamRepository.cs" />
-    <Compile Remove="Repositories\PlayerRepository.cs" />
+    <Compile Remove="Repositories\SportRepository.cs" />
   </ItemGroup>
 </Project>

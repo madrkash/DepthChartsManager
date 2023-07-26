@@ -9,11 +9,9 @@
 
   <ItemGroup>
     <None Remove="MappingConfigurations\" />
-    <None Remove="Builders\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MappingConfigurations\" />
-    <Folder Include="Builders\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="11.6.0" />
@@ -21,6 +19,9 @@
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
+    <PackageReference Include="Serilog" Version="3.0.1" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
   </ItemGroup>
   <ItemGroup>
     

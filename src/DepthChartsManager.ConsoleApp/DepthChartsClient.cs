@@ -1,24 +1,23 @@
-﻿using System;
-using AutoMapper;
+﻿using AutoMapper;
 using DepthChartsManager.Common.Constants;
 using DepthChartsManager.Common.Request;
-using DepthChartsManager.ConsoleApp.Builders;
+using DepthChartsManager.Common.Builders;
 using DepthChartsManager.Core.Contracts;
-using DepthChartsManager.Core.Services;
-using DepthChartsManager.Infrastructure.Repositories;
-using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
+using Microsoft.Extensions.Logging;
 
 namespace DepthChartsManager.ConsoleApp
 {
-	public class DepthChartsClient
+    public class DepthChartsClient
 	{
         private readonly IDepthChartService _depthChartService;
         private readonly IMapper _mapper;
-        public DepthChartsClient(IDepthChartService depthChartService, IMapper mapper)
+        private readonly ILogger<DepthChartsClient> _logger;
+
+        public DepthChartsClient(IDepthChartService depthChartService, IMapper mapper, ILogger<DepthChartsClient> logger)
         {
             _depthChartService = depthChartService;
             _mapper = mapper;
+            _logger = logger;
         }
         
         public async Task Process()
@@ -102,11 +101,11 @@ namespace DepthChartsManager.ConsoleApp
             {
                 foreach (var backupPlayerPosition in tomBradyBackups)
                 {
-                    Console.WriteLine($"#{backupPlayerPosition.Id} - {backupPlayerPosition.Name}");
+                    _logger.LogInformation($"#{backupPlayerPosition.Id} - {backupPlayerPosition.Name}");
                 }
             }
             var removePlayer = await _depthChartService.RemovePlayerFromDepthChart(_mapper.Map<RemovePlayerRequest>(tomBrady));
-            if (removePlayer != null) Console.WriteLine($"\n#{removePlayer.Id} - {removePlayer.Name}\n");
+            if (removePlayer != null) _logger.LogInformation($"\n#{removePlayer.Id} - {removePlayer.Name}\n");
 
             var fullDepthChart = await _depthChartService.GetFullDepthChart(new GetFullDepthChartRequestBuilder()
                 .WithLeagueId(nfl.Id)
@@ -117,7 +116,7 @@ namespace DepthChartsManager.ConsoleApp
             {
                 foreach (var group in fullDepthChart.GroupBy(p => p.Position))
                 {
-                    Console.WriteLine($"{group.Key} -{string.Join(",", group.Select(s => $" (#{s.Id}, {s.Name})"))}");
+                    _logger.LogInformation($"{group.Key} -{string.Join(",", group.Select(s => $" (#{s.Id}, {s.Name})"))}");
                 }
             }
             Console.ReadLine();
