@@ -107,7 +107,7 @@ namespace DepthChartsManager.ConsoleApp
             var removePlayer = await _depthChartService.RemovePlayerFromDepthChart(_mapper.Map<RemovePlayerRequest>(tomBrady));
             if (removePlayer != null) _logger.LogInformation($"\n#{removePlayer.Id} - {removePlayer.Name}\n");
 
-            var fullDepthChart = await _depthChartService.GetFullDepthChart(new GetFullDepthChartRequestBuilder()
+            var fullDepthChart = await _depthChartService.GetFullDepthChart(new GetAllPlayersRequestBuilder()
                 .WithLeagueId(nfl.Id)
                 .WithTeamId(tampaBayBuccaneers.Id)
                 .Build());

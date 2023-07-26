@@ -31,19 +31,26 @@ namespace DepthChartsManager.Core.UseCases.Player
         {
             var players = _playerRepository.GetAllPlayers(new GetAllPlayersRequest { LeagueId = request.GetPlayerBackupsRequest.LeagueId, TeamId = request.GetPlayerBackupsRequest.TeamId }).ToList();
 
-            if(!players.Any())
+            if (!players.Any())
             {
                 throw new PlayersNotFoundException(request.GetPlayerBackupsRequest.LeagueId, request.GetPlayerBackupsRequest.TeamId);
             }
 
-            var playerPositionDepth = players.Find(player => player.Id == request.GetPlayerBackupsRequest.PlayerId
-                                                        && string.Equals(request.GetPlayerBackupsRequest.Position, player.Position, StringComparison.OrdinalIgnoreCase)).PositionDepth;
+            var player = players.Find(player => player.Id == request.GetPlayerBackupsRequest.PlayerId
+                                                                   && string.Equals(request.GetPlayerBackupsRequest.Position, player.Position, StringComparison.OrdinalIgnoreCase));
+            if(player == null)
+            {
+                return Task.FromResult(Enumerable.Empty<Models.Player>());
+            }
+            var playerPositionDepth = player.PositionDepth;
 
             var backupPlayers = players.Where(player => player.Position == request.GetPlayerBackupsRequest.Position && player.PositionDepth > playerPositionDepth);
 
-            return Task.FromResult(backupPlayers.Any() ? backupPlayers : new List<Models.Player>{});
+            return Task.FromResult(backupPlayers.Any() ? backupPlayers : Enumerable.Empty<Models.Player>());
 
         }
+
+       
     }
 }
 

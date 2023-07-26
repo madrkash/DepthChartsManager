@@ -70,9 +70,12 @@ namespace DepthChartsManager.Core.UseCases.Player
             if (request.CreatePlayerRequest.PositionDepth != null)
             {
                 var backupPlayers = players.Where(nextPlayer => nextPlayer.PositionDepth >= index && nextPlayer.Position == request.CreatePlayerRequest.Position).ToList();
-                backupPlayers.ForEach(player => player.PositionDepth = player.PositionDepth + 1);
 
-                _playerRepository.UpdatePlayerPositions(backupPlayers);
+                if (backupPlayers.Any())
+                {
+                    backupPlayers.ForEach(player => player.PositionDepth = player.PositionDepth + 1);
+                    _playerRepository.UpdatePlayerPositions(backupPlayers);
+                }
             }
         }
 
