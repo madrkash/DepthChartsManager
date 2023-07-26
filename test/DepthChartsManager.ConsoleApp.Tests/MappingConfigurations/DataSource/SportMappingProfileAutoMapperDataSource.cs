@@ -46,5 +46,9 @@ namespace DepthChartsManager.Console.Tests.MappingConfigurations.DataSource
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
+
+   
 }
+
+
 

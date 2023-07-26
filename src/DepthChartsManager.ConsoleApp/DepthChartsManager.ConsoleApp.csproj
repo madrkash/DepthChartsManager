@@ -8,12 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Validators\" />
     <None Remove="MappingConfigurations\" />
     <None Remove="Builders\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Validators\" />
     <Folder Include="MappingConfigurations\" />
     <Folder Include="Builders\" />
   </ItemGroup>

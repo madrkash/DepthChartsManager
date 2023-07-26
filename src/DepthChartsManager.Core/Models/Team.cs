@@ -36,6 +36,11 @@ namespace DepthChartsManager.Core.Models
 
             int index = CalculatePositionDepth(createPlayerRequest);
 
+            if (createPlayerRequest.PositionDepth != null)
+            {
+                var backupPlayers = _players.Where(nextPlayer => nextPlayer.PositionDepth >= index && nextPlayer.Position == createPlayerRequest.Position).ToList();
+                backupPlayers.ForEach(player => player.PositionDepth = player.PositionDepth + 1);            }
+
             var player = new Player(createPlayerRequest.Id, createPlayerRequest.LeagueId, createPlayerRequest.TeamId, createPlayerRequest.Name, createPlayerRequest.Position, index);
             _players.Add(player);
             return player;
@@ -43,29 +48,29 @@ namespace DepthChartsManager.Core.Models
 
         private int CalculatePositionDepth(CreatePlayerRequest createPlayerRequest)
         {
-            int index = 0;
-
             if (createPlayerRequest.PositionDepth == null)
             {
                 if (_players.Any())
                 {
-                    var existingPlayers = _players.Where(x => x.Position == createPlayerRequest.Position).ToList();
+                    var existingPlayers = _players.Where(x => x.Position == createPlayerRequest.Position).OrderBy(x => x.PositionDepth).ToList();
                     if (existingPlayers.Any())
                     {
-                        index = (int)(existingPlayers.Last().PositionDepth + 1);
+                        return (int)(existingPlayers.Last().PositionDepth + 1);
                     }
+                }
+                else
+                {
+                    return 0;
                 }
             }
 
-            return index;
+            return (int)createPlayerRequest.PositionDepth;
         }
 
         public Player RemovePlayer(int playerId, string name, string position)
         {
             var player = _players.Find(p => p.Id == playerId && string.Equals(name, p.Name, StringComparison.OrdinalIgnoreCase) && string.Equals(position, p.Position, StringComparison.OrdinalIgnoreCase));
-
             var backupPlayers = _players.OrderBy(nextPlayer => nextPlayer.PositionDepth > player.PositionDepth).ToList();
-
             backupPlayers.ForEach(player => player.PositionDepth = player.PositionDepth - 1);
 
             _players.Remove(player);

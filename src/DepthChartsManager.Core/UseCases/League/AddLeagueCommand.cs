@@ -29,14 +29,7 @@ namespace DepthChartsManager.Core.UseCases.League
 
         public Task<Models.League> Handle(AddLeagueCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
-                return Task.FromResult(_sportRepository.AddLeague(request.CreateLeagueRequest));
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            return Task.FromResult(_sportRepository.AddLeague(request.CreateLeagueRequest));
         }
     }
 }

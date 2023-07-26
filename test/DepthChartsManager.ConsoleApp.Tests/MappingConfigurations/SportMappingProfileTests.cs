@@ -1,4 +1,5 @@
 ﻿using System;
+using DepthChartsManager.Common.Request;
 using DepthChartsManager.Common.Response;
 using DepthChartsManager.Console.Tests.Fixtures;
 using DepthChartsManager.Console.Tests.MappingConfigurations.DataSource;
@@ -38,6 +39,27 @@ namespace DepthChartsManager.Console.Tests.MappingConfigurations
 
             result.Should().NotBeNull();
         }
+
+        [Theory]
+        [ClassData(typeof(PlayerAutoMapperDataSource))]
+        public void Map_Player_To_GetPlayerBackupsRequest_Should_Work(Player player)
+        {
+            var mapper = new MapperFixture().Mapper;
+            var result = mapper.Map<GetPlayerBackupsRequest>(player);
+
+            result.Should().NotBeNull();
+        }
+
+        [Theory]
+        [ClassData(typeof(PlayerAutoMapperDataSource))]
+        public void Map_Player_To_RemovePlayerRequest_Should_Work(Player player)
+        {
+            var mapper = new MapperFixture().Mapper;
+            var result = mapper.Map<RemovePlayerRequest>(player);
+
+            result.Should().NotBeNull();
+        }
+
     }
 }
 

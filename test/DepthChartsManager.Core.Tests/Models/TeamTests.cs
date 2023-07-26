@@ -15,7 +15,7 @@ namespace DepthChartsManager.Core.Tests.Models
     public class TeamTests
     {
         [Fact]
-        public void AddPlayer_WhenPlayerDoesNotExist_ShouldAddPlayer()
+        public void AddPlayer_WhenThePlayerListIsEmpty_ShouldAddPlayer()
         {
             // Arrange
             var createPlayerRequest = new CreatePlayerRequest
@@ -38,6 +38,68 @@ namespace DepthChartsManager.Core.Tests.Models
             Assert.Single(team.Players);
             Assert.Equal("John Doe", team.Players[0].Name);
             Assert.Equal("Forward", team.Players[0].Position);
+        }
+
+        [Fact]
+        public void AddPlayer_WhenPlayerListHasData_ShouldAddPlayerAtTheDesiredPosition_And_UpdateTheRelevantPlayerPositions()
+        {
+            // Arrange
+            var createPlayerRequest = new CreatePlayerRequest
+            {
+                Id = 1,
+                LeagueId = 1,
+                TeamId = 1,
+                Name = "John Doe",
+                Position = "Forward",
+                PositionDepth = null
+            };
+
+            var createPlayerRequest1 = new CreatePlayerRequest
+            {
+                Id = 2,
+                LeagueId = 1,
+                TeamId = 1,
+                Name = "Smith Doe",
+                Position = "Forward",
+                PositionDepth = null
+            };
+
+            var createPlayerRequest2 = new CreatePlayerRequest
+            {
+                Id = 3,
+                LeagueId = 1,
+                TeamId = 1,
+                Name = "Philip Doe",
+                Position = "Forward",
+                PositionDepth = null
+            };
+
+            var team = new Team(1, 1, "Test Team");
+            var john = team.AddPlayer(createPlayerRequest);
+            var smith = team.AddPlayer(createPlayerRequest1);
+            var philip = team.AddPlayer(createPlayerRequest2);
+
+            // Act
+            var createPlayerRequest3 = new CreatePlayerRequest
+            {
+                Id = 4,
+                LeagueId = 1,
+                TeamId = 1,
+                Name = "Prashanth Bhat",
+                Position = "Forward",
+                PositionDepth = 1
+            };
+
+            var prashanth = team.AddPlayer(createPlayerRequest3);
+
+            // Assert
+            Assert.NotNull(prashanth);
+            Assert.Equal(4, team.Players.Count);
+            Assert.Equal(1, prashanth.PositionDepth);
+            Assert.Equal("Smith Doe", team.Players[2].Name);
+            Assert.Equal(2, team.Players[2].PositionDepth);
+            Assert.Equal("Philip Doe", team.Players[3].Name);
+            Assert.Equal(3, team.Players[3].PositionDepth);
         }
 
         [Fact]
@@ -101,6 +163,7 @@ namespace DepthChartsManager.Core.Tests.Models
             Assert.Equal(1, team.Players[1].PositionDepth);
         }
 
+       
         [Fact]
         public void RemovePlayer_WhenPlayerDoesNotExist_ShouldReturnNull()
         {

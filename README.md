@@ -26,13 +26,11 @@ Coming soon...
 * Single repository to cater to the hierarchical nature of data without a persistence layer.
 * Rich models versus POCO models
 
-
-
 # If I had more time, I would have implemented the below.
 
-* Entity based repository
+* Create an API with Swagger UI
 * Design database
-* Implement business logic within the command handlers
+* Entity based repository along with ORM framework like Dapper.
 * Containerise the app and database
 * Create pipeline on Github Actions & Workflows
 * Host the app on AWS

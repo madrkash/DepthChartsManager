@@ -26,11 +26,13 @@
     <None Remove="Services\" />
     <None Remove="Models\" />
     <None Remove="UseCases\" />
+    <None Remove="Fixtures\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Services\" />
     <Folder Include="Models\" />
     <Folder Include="UseCases\" />
+    <Folder Include="Fixtures\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\DepthChartsManager.Common\DepthChartsManager.Common.csproj" />

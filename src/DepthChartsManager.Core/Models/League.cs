@@ -5,7 +5,6 @@ namespace DepthChartsManager.Core.Models
     public class League
     {
         private List<Team> _teams = new List<Team>();
-        private CreateLeagueRequest createLeagueRequest;
 
         public List<Team> Teams
         {
@@ -23,10 +22,10 @@ namespace DepthChartsManager.Core.Models
             Name =  name;
         }
 
-        public League(CreateLeagueRequest createLeagueRequest)
-        {
-            this.createLeagueRequest = createLeagueRequest;
-        }
+        //public League(CreateLeagueRequest createLeagueRequest)
+        //{
+        //    this.createLeagueRequest = createLeagueRequest;
+        //}
 
         public Team GetTeam(int id)
         {

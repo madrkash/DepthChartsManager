@@ -7,9 +7,12 @@ namespace DepthChartsManager.Infrastructure.Repositories
 {
 	public class PlayerRepository : IPlayerRepository
 	{
+        private readonly List<Player> _players;
+
 		public PlayerRepository()
 		{
-		}
+            _players = new List<Player>();
+        }
 
         public Player AddPlayerToDepthChart(Player player)
         {

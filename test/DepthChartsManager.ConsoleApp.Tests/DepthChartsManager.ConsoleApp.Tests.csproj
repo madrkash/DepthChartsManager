@@ -28,12 +28,14 @@
     <None Remove="MappingConfigurations\" />
     <None Remove="Fixtures\" />
     <None Remove="MappingConfigurations\DataSource\" />
+    <None Remove="Component\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Validators\" />
     <Folder Include="MappingConfigurations\" />
     <Folder Include="Fixtures\" />
     <Folder Include="MappingConfigurations\DataSource\" />
+    <Folder Include="Component\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\DepthChartsManager.Common\DepthChartsManager.Common.csproj" />
