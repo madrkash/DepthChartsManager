@@ -24,11 +24,9 @@
 
   <ItemGroup>
     <None Remove="UseCases\" />
-    <None Remove="Fixtures\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="UseCases\" />
-    <Folder Include="Fixtures\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\DepthChartsManager.Common\DepthChartsManager.Common.csproj" />
