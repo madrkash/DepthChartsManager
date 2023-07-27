@@ -33,26 +33,32 @@ namespace DepthChartsManager.Core.UseCases.Player
 
         public Task<Models.Player> Handle(AddPlayerCommand request, CancellationToken cancellationToken)
         {
-           
+
+                //check if the league provided exists
                 _ = _leagueRepository.GetLeague(request.CreatePlayerRequest.LeagueId) ??
                throw new LeagueNotFoundException(request.CreatePlayerRequest.LeagueId);
 
+                //check if the team provided exists                
                 var teams = _teamRepository.GetTeams(request.CreatePlayerRequest.LeagueId).ToList();
                 if (!teams.Exists(team => team.Id == request.CreatePlayerRequest.TeamId))
                 {
                     throw new TeamNotFoundException(request.CreatePlayerRequest.LeagueId, request.CreatePlayerRequest.TeamId);
                 }
 
+                //fetch all the team players   
                 var players = _playerRepository.GetAllPlayers(new GetAllPlayersRequest { TeamId = request.CreatePlayerRequest.TeamId, LeagueId = request.CreatePlayerRequest.LeagueId }).ToList();
                 if (DoesPlayerExist(request, players))
                 {
                     throw new PlayerAlreadyExistsException(request.CreatePlayerRequest.Name, request.CreatePlayerRequest.Position);
                 }
 
+                //calculate position depth for the player to be added
                 int index = CalculatePositionDepth(players, request.CreatePlayerRequest);
 
+                //update position depth for the affected backup players
                 UpdateBackupPlayerPositions(request, players, index);
 
+                //add the player to the team at the calculated position depth
                 return Task.FromResult(_playerRepository.AddPlayerToDepthChart(new Models.Player
                 {
                     Id = request.CreatePlayerRequest.Id,
