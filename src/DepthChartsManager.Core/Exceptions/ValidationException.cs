@@ -3,8 +3,8 @@ namespace DepthChartsManager.Core.Exceptions
 {
 	public class ValidationException : Exception
 	{
-		public ValidationException(string leagueName)
-			: base($"Validation errors: {leagueName}")
+		public ValidationException(string validationErrors)
+			: base($"Validation errors: {validationErrors}")
 		{
 
 		}
