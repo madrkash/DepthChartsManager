@@ -42,9 +42,8 @@ namespace DepthChartsManager.Core.UseCases.Player
             {
                 return Task.FromResult(Enumerable.Empty<Models.Player>());
             }
-            var playerPositionDepth = player.PositionDepth;
-
-            var backupPlayers = players.Where(player => player.Position == request.GetPlayerBackupsRequest.Position && player.PositionDepth > playerPositionDepth);
+            
+            var backupPlayers = players.Where(backupPlayer => backupPlayer.Position == request.GetPlayerBackupsRequest.Position && backupPlayer.PositionDepth > player.PositionDepth);
 
             return Task.FromResult(backupPlayers.Any() ? backupPlayers : Enumerable.Empty<Models.Player>());
 
